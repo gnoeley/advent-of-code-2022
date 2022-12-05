@@ -23,14 +23,22 @@ class Day02 {
                 }
             }
 
-            fun toWin() = values()[(ordinal + 1) % 3]
-            fun toDraw() = this
-            fun toLoose() = values()[(ordinal + 2) % 3]
+            fun forStrategyOutcome(input: String) = when(input) {
+                "X" -> toLoose()
+                "Y" -> toDraw()
+                "Z" -> toWin()
+                else -> throw RuntimeException("Invalid outcome: $input")
+            }
+
             fun outcomeScore(other: Shape) = when(other) {
                 toWin() -> 0
                 toDraw() -> 3
                 else -> 6
             }
+
+            private fun toWin() = values()[(ordinal + 1) % 3]
+            private fun toDraw() = this
+            private fun toLoose() = values()[(ordinal + 2) % 3]
         }
 
         fun solveA(input: List<String>) = input.sumOf {
@@ -44,13 +52,7 @@ class Day02 {
         fun solveB(input: List<String>) = input.sumOf {
             it.split(" ").let { strategy ->
                 val opponentShape = fromStrategy(strategy[0])
-                val playerShape = when (strategy[1]) {
-                    "X" -> opponentShape.toLoose()
-                    "Y" -> opponentShape.toDraw()
-                    "Z" -> opponentShape.toWin()
-                    else -> throw RuntimeException("Invalid outcome: ${strategy[1]}")
-                }
-
+                val playerShape = opponentShape.forStrategyOutcome(strategy[1])
                 playerShape.score + playerShape.outcomeScore(opponentShape)
             }
         }

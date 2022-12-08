@@ -1,3 +1,5 @@
+import java.util.function.Function
+
 fun main() {
     val input = "input/day03-b.txt".readLines()
 //    println("Day 03 - A result = ${Day03.solveA(input)}")
@@ -11,29 +13,19 @@ object Day03 {
         .map { rucksack -> rucksack.first.first { rucksack.second.contains(it) } }
         .sumOf { it.toItemPriority }
 
-    private val Char.toItemPriority get() =
-        (if (isLowerCase()) this - 96 else this - 38).code
+    private val Char.toItemPriority
+        get() =
+            (if (isLowerCase()) this - 96 else this - 38).code
 
-    fun solveB(input: List<String>): Int = input
-        .foldRight(mutableListOf(BackpackGroup())) { backpack, acc ->
-            if (!acc.last().add(backpack)) {
-                val newGroup = BackpackGroup()
-                newGroup.add(backpack)
-                acc.add(newGroup)
-            }
-            acc
+    fun solveB(input: List<String>): Int = input.chunked(3)
+        .sumOf { backpacks ->
+            backpacks
+                .flatMap { it.toSet() }
+                .groupingBy { it }
+                .eachCount()
+                .filter { it.value == 3 }
+                .keys
+                .first()
+                .toItemPriority
         }
-        .sumOf { it.findBadge().toItemPriority }
-
-    class BackpackGroup {
-        private val backpacks = mutableListOf<String>()
-        fun add(backpack: String): Boolean = if (backpacks.size == 3) false else backpacks.add(backpack)
-        fun findBadge(): Char = backpacks
-            .flatMap { it.toSet() }
-            .groupBy { it }
-            .mapValues { it.value.size }
-            .filterValues { it == 3 }
-            .keys
-            .first()
-    }
 }

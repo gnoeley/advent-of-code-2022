@@ -22,4 +22,21 @@ class Day03Test {
 
         assertEquals(157, actual)
     }
+
+    // Badge "type" is common between all three elves
+    @Test
+    fun solveDay03B() {
+        val input = """
+            vJrwpWtwJgWrhcsFMMfFFhFp
+            jqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL
+            PmmdzqPrVvPwwTWBwg
+            wMqvLMZHhHMvwLHjbvcjnnSBnvTQFn
+            ttgJtRGJQctTZtZT
+            CrZsJsPPZsGzwwsLwLmpwMDw
+        """.trimIndent().lines()
+
+        val actual = Day03.solveB(input)
+
+        assertEquals(70, actual)
+    }
 }

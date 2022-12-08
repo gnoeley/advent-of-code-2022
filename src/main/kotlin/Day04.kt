@@ -6,8 +6,11 @@ fun main() {
 
 object Day04 {
     fun solveA(input: List<String>): Int = input
-        .map { it.split(",").let { (first, second) -> first.toRange() to second.toRange() } }
+        .map { it.toSectionPair() }
         .count { (first, second) -> first.all { second.contains(it) } || second.all { first.contains(it) } }
+
+    private fun String.toSectionPair() =
+        split(",").let { (first, second) -> first.toRange() to second.toRange() }
 
     private fun String.toRange() = split("-").map { it.toInt() }.let { (start, end) -> start..end }
 }

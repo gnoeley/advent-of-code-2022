@@ -10,7 +10,8 @@ object Day06 {
     fun solveB(input: List<String>): Int = indexOfMarker(input.first(), 14)
 
     private fun indexOfMarker(message: String, markerLength: Int) =
-        message.windowed(markerLength)
-            .first { it.toSet().size == markerLength }
-            .let { message.indexOf(it) + markerLength }
+        message.windowedSequence(markerLength)
+            .withIndex()
+            .first { (_, value) -> value.toSet().size == markerLength }
+            .let { (index) -> index + markerLength }
 }

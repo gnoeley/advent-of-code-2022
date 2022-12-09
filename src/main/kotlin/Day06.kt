@@ -5,13 +5,12 @@ fun main() {
 }
 
 object Day06 {
-    fun solveA(input: List<String>): Int = input.first().let {
-        val marker = it.windowed(4).first { it.groupingBy { it }.eachCount().values.all { it == 1 } }
-        it.indexOf(marker) + 4
-    }
+    fun solveA(input: List<String>): Int = indexOfMarker(input.first(), 4)
 
-    fun solveB(input: List<String>): Int = input.first().let {
-        val marker = it.windowed(14).first { it.groupingBy { it }.eachCount().values.all { it == 1 } }
-        it.indexOf(marker) + 14
-    }
+    fun solveB(input: List<String>): Int = indexOfMarker(input.first(), 14)
+
+    private fun indexOfMarker(message: String, markerLength: Int) =
+        message.windowed(markerLength)
+            .first { it.toSet().size == markerLength }
+            .let { message.indexOf(it) + markerLength }
 }

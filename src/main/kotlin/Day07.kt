@@ -13,12 +13,22 @@ object Day07 {
 
         fun size(): Int = files.sumOf { it.size } + directories.sumOf { it.size() }
         fun allDirs(): List<Directory> = directories + directories.flatMap { it.allDirs() }
+        override fun toString(): String = "dir $name\n" +
+                files.joinToString("\n", postfix = "\n") { "  ${it.size} ${it.name}" } +
+                directories.joinToString("\n") { it.toString() }.lines().joinToString("\n") { "    $it" }
     }
 
     fun solveA(input: List<String>): Int {
         val root = Directory("")
         parseConsole(input, root)
         return root.allDirs().map { it.size() }.filter { it < 100000 }.sum()
+    }
+
+    fun solveB(input: List<String>): Int {
+        val root = Directory("")
+        parseConsole(input, root)
+        val sizeToFree = 30000000 - (70000000 - root.size())
+        return root.allDirs().filter { it.size() > sizeToFree }.minByOrNull { it.size() }!!.size()
     }
 
     private fun parseConsole(console: List<String>, directory: Directory): Int {
@@ -46,6 +56,4 @@ object Day07 {
         }
         return console.size
     }
-
-    fun solveB(input: List<String>): Int = 0
 }

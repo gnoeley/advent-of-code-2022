@@ -6,6 +6,10 @@ fun main() {
 
 object Day07 {
 
+    private val CD_PARENT_REGEX = "\\$ cd \\.\\.".toRegex()
+    private val CD_DIR_REGEX = "\\$ cd ([A-z/]+)".toRegex()
+    private val FILE_LISTING_REGEX = "([0-9]+) (.+)".toRegex()
+
     data class File(val name: String, val size: Int)
     data class Directory(val name: String) {
         val directories: MutableList<Directory> = mutableListOf()
@@ -36,19 +40,18 @@ object Day07 {
         while (index < console.size) {
             val line = console[index]
 
-            if (line.matches("\\$ cd \\.\\.".toRegex())) {
+            if (line.matches(CD_PARENT_REGEX)) {
                 return index
             }
 
-            if (line.matches("\\$ cd ([A-z/]+)".toRegex())) {
-                val next = Directory("\\$ cd ([A-z/]+)".toRegex().matchEntire(line)!!.groupValues[1])
+            if (line.matches(CD_DIR_REGEX)) {
+                val next = Directory(CD_DIR_REGEX.matchEntire(line)!!.groupValues[1])
                 directory.directories.add(next)
                 index += parseConsole(console.subList(index+1, console.size), next) + 1
 
-            } else if (line.matches("([0-9]+) (.+)".toRegex())) {
-                "([0-9]+) (.+)".toRegex().matchEntire(line)?.groupValues?.also { (_, size, name) ->
-                    directory.files.add(File(name, size.toInt()))
-                }
+            } else if (line.matches(FILE_LISTING_REGEX)) {
+                val (_, size, name) = FILE_LISTING_REGEX.matchEntire(line)!!.groupValues
+                directory.files.add(File(name, size.toInt()))
 
             }
 

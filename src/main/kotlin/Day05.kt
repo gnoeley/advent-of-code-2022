@@ -7,14 +7,13 @@ fun main() {
 object Day05 {
     fun solveA(input: List<String>): String = toContainerStacks(input).apply {
         toMoves(input).forEach { (move, from, to) ->
-            repeat(move) { this[to - 1].add(this[from - 1].removeLast()) }
+            repeat(move) { get(to).add(get(from).removeLast()) }
         }
     }.joinToString("") { it.last() }
 
     fun solveB(input: List<String>): String = toContainerStacks(input).apply {
         toMoves(input).forEach { (move, from, to) ->
-            val toMove = (1..move).map { this[from - 1].removeLast() }.reversed()
-            this[to - 1].addAll(toMove)
+            get(to).addAll((1..move).map { get(from).removeLast() }.reversed())
         }
     }.joinToString("") { it.last() }
 
@@ -37,6 +36,6 @@ object Day05 {
             "move ([0-9]+) from ([0-9]+) to ([0-9]+)".toRegex()
                 .matchEntire(it)!!.groupValues
                 .takeLast(3)
-                .map(String::toInt)
+                .let { (moves, from, to) -> listOf(moves.toInt(), from.toInt() - 1, to.toInt() - 1)}
         }
 }

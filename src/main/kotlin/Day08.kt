@@ -14,24 +14,10 @@ object Day08 {
             }
         }
 
-    private fun calculateVisibility(
-        trees: List<List<Int>>,
-        rowIndex: Int,
-        colIndex: Int,
-        tree: Int
-    ) = if (treeIsOnPerimeter(trees, rowIndex, colIndex)) {
-        1
-    } else {
+    private fun calculateVisibility(trees: List<List<Int>>, rowIndex: Int, colIndex: Int, tree: Int) =
         otherTrees(trees, rowIndex, colIndex)
-            .any { it.all { otherTree -> otherTree < tree } }
+            .any { it.isEmpty() || it.all { otherTree -> otherTree < tree } }
             .let { if (it) 1 else 0 }
-    }
-
-    private fun treeIsOnPerimeter(
-        trees: List<List<Int>>,
-        row: Int,
-        col: Int
-    ) = row == 0 || row == trees.size - 1 || col == 0 || col == trees.first().size - 1
 
     private fun otherTrees(trees: List<List<Int>>, col: Int, row: Int) = trees.run {
         val treesToLeft = get(row).take(col)

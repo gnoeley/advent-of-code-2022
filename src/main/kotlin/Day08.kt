@@ -10,26 +10,17 @@ object Day08 {
     fun solveA(input: List<String>): Int =
         input.map { it.map { height -> height.toString().toInt() } }
             .run {
-                foldIndexed(0) { row, acc, rowOfTrees ->
-                    acc + List(rowOfTrees.size) { col -> calculateVisibility(this, row, col) }.sum()
-                }
+                flatMapIndexed { row, rowOfTrees ->
+                    List(rowOfTrees.size) { col -> calculateVisibility(this, row, col) }
+                }.sum()
             }
 
     fun solveB(input: List<String>): Int =
         input.map { it.map { height -> height.toString().toInt() } }
             .run {
-                foldIndexed(0) { row, acc, rowOfTrees ->
-                    max(
-                        acc,
-                        List(rowOfTrees.size) { col ->
-                            calculateScenicScore(
-                                this,
-                                row,
-                                col
-                            )
-                        }.maxOrNull()!!
-                    )
-                }
+                flatMapIndexed { row, rowOfTrees ->
+                    List(rowOfTrees.size) { col -> calculateScenicScore(this, row, col) }
+                }.maxOrNull()!!
             }
 
     private fun calculateScenicScore(trees: List<List<Int>>, row: Int, col: Int) =

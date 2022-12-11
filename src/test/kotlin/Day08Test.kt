@@ -19,4 +19,19 @@ class Day08Test {
 
         assertEquals(21, actual)
     }
+
+    @Test
+    fun solveDay08B() {
+        val input = """
+            30373
+            25512
+            65332
+            33549
+            35390
+        """.trimIndent().lines()
+
+        val actual = Day08.solveB(input)
+
+        assertEquals(8, actual)
+    }
 }

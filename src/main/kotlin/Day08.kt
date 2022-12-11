@@ -5,34 +5,40 @@ fun main() {
 }
 
 object Day08 {
-    // For each tree:
-    // If at edge; visible = true
-    // Elif any tree to left, right, bottom or top < height; visible = true
-    // Else; visible = false
-    fun solveA(input: List<String>): Int {
-        val trees = input.map { it.map { height -> height.toString().toInt() } }
-
-        var visibleCount = 0
-        for ((rowIndex, rowOfTrees) in trees.withIndex()) {
-            for ((colIndex, tree) in rowOfTrees.withIndex()) {
-                if (rowIndex == 0 || rowIndex == trees.size - 1 || colIndex == 0 || colIndex == trees.first().size - 1) {
-                    visibleCount += 1
-                } else {
-                    val treesToLeft = rowOfTrees.take(colIndex)
-                    val treesToRight = rowOfTrees.takeLast(rowOfTrees.size - colIndex - 1)
-                    val treesToTop = trees.take(rowIndex).map { it[colIndex] }
-                    val treesToBottom = trees.takeLast(trees.size - rowIndex - 1).map { it[colIndex] }
-
-                    val isVisible = listOf(treesToLeft, treesToRight, treesToTop, treesToBottom)
-                        .any { it.all { otherTree -> otherTree < tree } }
-                    if (isVisible) {
-                        visibleCount += 1
-                    }
+    fun solveA(input: List<String>): Int = input.map { it.map { height -> height.toString().toInt() } }
+        .run {
+            foldIndexed(0) { rowIndex, rowAcc, rowOfTrees ->
+                rowAcc + rowOfTrees.foldIndexed(0) { colIndex, colAcc, tree ->
+                    colAcc + calculateVisibility(this, rowIndex, colIndex, tree)
                 }
             }
         }
 
-        return visibleCount
+    private fun calculateVisibility(
+        trees: List<List<Int>>,
+        rowIndex: Int,
+        colIndex: Int,
+        tree: Int
+    ) = if (treeIsOnPerimeter(trees, rowIndex, colIndex)) {
+        1
+    } else {
+        otherTrees(trees, rowIndex, colIndex)
+            .any { it.all { otherTree -> otherTree < tree } }
+            .let { if (it) 1 else 0 }
+    }
+
+    private fun treeIsOnPerimeter(
+        trees: List<List<Int>>,
+        row: Int,
+        col: Int
+    ) = row == 0 || row == trees.size - 1 || col == 0 || col == trees.first().size - 1
+
+    private fun otherTrees(trees: List<List<Int>>, col: Int, row: Int) = trees.run {
+        val treesToLeft = get(row).take(col)
+        val treesToRight = get(row).takeLast(get(row).size - col - 1)
+        val treesToTop = take(row).map { it[col] }
+        val treesToBottom = takeLast(size - row - 1).map { it[col] }
+        listOf(treesToLeft, treesToRight, treesToTop, treesToBottom)
     }
 
     fun solveB(input: List<String>): Int = 0

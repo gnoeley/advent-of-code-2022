@@ -14,6 +14,8 @@ object Day08 {
             }
         }
 
+    fun solveB(input: List<String>): Int = 0
+
     private fun calculateVisibility(trees: List<List<Int>>, rowIndex: Int, colIndex: Int, tree: Int) =
         otherTrees(trees, rowIndex, colIndex)
             .any { it.isEmpty() || it.all { otherTree -> otherTree < tree } }
@@ -26,6 +28,4 @@ object Day08 {
         val treesToBottom = takeLast(size - row - 1).map { it[col] }
         listOf(treesToLeft, treesToRight, treesToTop, treesToBottom)
     }
-
-    fun solveB(input: List<String>): Int = 0
 }

@@ -5,20 +5,19 @@ fun main() {
 }
 
 object Day08 {
-    fun solveA(input: List<String>): Int = input.map { it.map { height -> height.toString().toInt() } }
-        .run {
-            foldIndexed(0) { rowIndex, rowAcc, rowOfTrees ->
-                rowAcc + rowOfTrees.foldIndexed(0) { colIndex, colAcc, tree ->
-                    colAcc + calculateVisibility(this, rowIndex, colIndex, tree)
+    fun solveA(input: List<String>): Int =
+        input.map { it.map { height -> height.toString().toInt() } }
+            .run {
+                foldIndexed(0) { row, acc, rowOfTrees ->
+                    acc + List(rowOfTrees.size) { col -> calculateVisibility(this, row, col) }.sum()
                 }
             }
-        }
 
     fun solveB(input: List<String>): Int = 0
 
-    private fun calculateVisibility(trees: List<List<Int>>, rowIndex: Int, colIndex: Int, tree: Int) =
-        otherTrees(trees, rowIndex, colIndex)
-            .any { it.isEmpty() || it.all { otherTree -> otherTree < tree } }
+    private fun calculateVisibility(trees: List<List<Int>>, col: Int, row: Int) =
+        otherTrees(trees, col, row)
+            .any { it.isEmpty() || it.all { otherTree -> otherTree < trees[row][col] } }
             .let { if (it) 1 else 0 }
 
     private fun otherTrees(trees: List<List<Int>>, col: Int, row: Int) = trees.run {

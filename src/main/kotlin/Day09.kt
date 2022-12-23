@@ -40,4 +40,5 @@ object Day09 {
         }
         return visited.size
     }
+    fun solveB(input: List<String>): Int = 0
 }

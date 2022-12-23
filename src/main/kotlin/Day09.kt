@@ -3,26 +3,42 @@ import kotlin.math.abs
 fun main() {
     val input = "input/day09.txt".readLines()
     println("Day 09 - A result = ${Day09.solveA(input)}")
-//    println("Day 09 - B result = ${Day09.solveB(input)}")
+    println("Day 09 - B result = ${Day09.solveB(input)}")
 }
 
 object Day09 {
     fun solveA(input: List<String>): Int {
         val moves = parseMoves(input)
-
-        var head = 0 to 0
-        var tail = 0 to 0
-        val visited = mutableSetOf(tail.copy())
-
-        for ((x, y) in moves) {
-            head = head.first + x to head.second + y
-            tail = nextTail(head, tail)
-            visited.add(tail.copy())
-        }
-        return visited.size
+        val rope = mutableListOf(0 to 0, 0 to 0)
+        return calculateVisitedLocations(rope, moves)
     }
 
-    fun solveB(input: List<String>): Int = 0
+    fun solveB(input: List<String>): Int {
+        val moves = parseMoves(input)
+        val rope = (1 .. 10).map { 0 to 0 }.toMutableList()
+        return calculateVisitedLocations(rope, moves)
+    }
+
+    private fun calculateVisitedLocations(
+        rope: MutableList<Pair<Int, Int>>,
+        moves: List<Pair<Int, Int>>
+    ): Int {
+        val visited = mutableSetOf(rope.last().copy())
+
+        for ((x, y) in moves) {
+            val head = rope[0]
+            rope[0] = head.first + x to head.second + y
+
+            for (i in (0..rope.size - 2)) {
+                val nextTail = nextTail(rope[i], rope[i + 1])
+                rope[i + 1] = nextTail
+            }
+
+            visited.add(rope.last().copy())
+        }
+
+        return visited.size
+    }
 
     private fun nextTail(head: Pair<Int, Int>, tail: Pair<Int, Int>): Pair<Int, Int> {
         val diffX = tail.first - head.first // if > abs(2); move 1 in that direction

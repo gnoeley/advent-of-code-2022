@@ -1,3 +1,4 @@
+import java.lang.Thread.sleep
 import kotlin.math.abs
 
 fun main() {
@@ -10,6 +11,7 @@ object Day09 {
     fun solveA(input: List<String>): Int {
         val moves = parseMoves(input)
         val rope = mutableListOf(0 to 0, 0 to 0)
+        printRope(rope, emptySet())
         return calculateVisitedLocations(rope, moves)
     }
 
@@ -35,6 +37,8 @@ object Day09 {
             }
 
             visited.add(rope.last().copy())
+
+            printRope(rope, visited)
         }
 
         return visited.size
@@ -63,5 +67,37 @@ object Day09 {
                     }
                 }
             }
+    }
+
+    private fun printRope(rope: List<Pair<Int, Int>>, visited: Set<Pair<Int, Int>>) {
+        val xOffset = 15
+        val yOffset = 5
+        val result = StringBuilder()
+        for (y in (21 downTo 0)) {
+            for (x in (0 .. 32)) {
+                var output = if (x - xOffset to y - yOffset == 0 to 0)  // starting pos
+                    "s"
+                else if (visited.contains(x - xOffset to y - yOffset))  // visited location
+                    "#"
+                else                                                    // unvisited
+                    "."
+
+                // Check for current rope pos
+                for ((i, pos) in rope.withIndex()) {
+                    if (pos.first + xOffset to pos.second + yOffset == x to y) {
+                        output = if (i == 0) "H" else if (i == rope.size - 1) "T" else i.toString()
+                        break
+                    }
+                }
+
+                result.append("$output ")
+            }
+            result.append("\n")
+        }
+
+        print((23 downTo 0).fold(StringBuilder()) { acc, _ -> acc.append("\n") }.toString())
+        sleep(100)
+        println(result.toString())
+        sleep(300)
     }
 }

@@ -59,6 +59,6 @@ class Day11Test {
     @Test
     fun solvedDay11B() {
         val actual = Day11.solveB(input)
-        assertEquals(2713310158U, actual)
+        assertEquals(2713310158L, actual)
     }
 }

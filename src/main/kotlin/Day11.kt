@@ -1,11 +1,8 @@
-import java.math.BigInteger
-
 fun main() {
     val input = "input/day11.txt".readLines()
     println("Day 11 - A result = ${Day11.solveA(input)}")
     println("Day 11 - B result = ${Day11.solveB(input)}")
 }
-
 
 object Day11 {
     fun solveA(input: List<String>): UInt = input
@@ -25,7 +22,7 @@ object Day11 {
         .take(2)
         .let { (first, second) -> first.inspections * second.inspections }
 
-    fun solveB(input: List<String>): UInt = input
+    fun solveB(input: List<String>): Long = input
         .joinToString("\n")
         .split("\n\n")
         .map { Monkey.from(it, false) }
@@ -33,25 +30,22 @@ object Day11 {
             monkeys.forEachIndexed { index, monkey ->
                 monkeys.forEach { other -> other.monkeyDiscovered(index, monkey) }
             }
-            var iterations = 0
             repeat((1..10000).count()) {
-                iterations++
                 monkeys.forEach {
                     it.doRound()
                 }
-                if (iterations % 100 == 0) println("Total iterations: $iterations")
             }
             monkeys
         }
         .sortedByDescending { it.inspections }
         .take(2)
-        .let { (first, second) -> first.inspections * second.inspections }
+        .let { (first, second) -> first.inspections.toLong() * second.inspections.toLong() }
 }
 
 class Monkey private constructor(
     private val items: MutableList<Item>,
-    private val inspectFun: (worry: BigInteger) -> BigInteger,
-    private val testCondition: BigInteger,
+    private val inspectFun: (worry: Long) -> Long,
+    private val testCondition: Long,
     private val throwOnTrue: Int,
     private val throwOnFalse: Int
 ) {
@@ -60,14 +54,13 @@ class Monkey private constructor(
 
     private val otherMonkeys: MutableMap<Int, Monkey> = mutableMapOf()
     private val commonTestConditionDivisor by lazy {
-        otherMonkeys.values.map { it.testCondition }.reduceRight(BigInteger::times)
-
+        otherMonkeys.values.map { it.testCondition }.reduceRight(Long::times).also { println(it) }
     }
     companion object {
         fun from(input: String, worryDecreases: Boolean): Monkey {
             val lines = input.split("\n").map { it.trim() }
-            val itemWorryScores = Regex("(\\d+)+").findAll(lines[1]).map { it.value.toBigInteger() }.toList()
-            val testCondition = Regex("(\\d+)+").find(lines[3])!!.value.toBigInteger()
+            val itemWorryScores = Regex("(\\d+)+").findAll(lines[1]).map { it.value.toLong() }.toList()
+            val testCondition = Regex("(\\d+)+").find(lines[3])!!.value.toLong()
             val monkeyThrowOnTrue = Regex("(\\d+)+").find(lines[4])!!.value.toInt()
             val monkeyThrowOnFalse = Regex("(\\d+)+").find(lines[5])!!.value.toInt()
 
@@ -83,26 +76,26 @@ class Monkey private constructor(
         private fun parseUpdateFunction(input: String, worryDecreases: Boolean) =
             Regex("Operation: new = (old|\\d+) ([+\\-*/]) (old|\\d+)").find(input)!!.groupValues
                 .let { (_, firstOperand, operator, secondOperand) ->
-                    { worry: BigInteger ->
+                    { worry: Long ->
                         val parsedFirstOperand = when (firstOperand) {
                             "old" -> worry
-                            else -> firstOperand.toBigInteger()
+                            else -> firstOperand.toLong()
                         }
 
                         val parsedSecondOperand = when (secondOperand) {
                             "old" -> worry
-                            else -> secondOperand.toBigInteger()
+                            else -> secondOperand.toLong()
                         }
 
-                        val parsedOperator: (BigInteger, BigInteger) -> BigInteger = when (operator) {
-                            "+" -> BigInteger::plus
-                            "-" -> BigInteger::minus
-                            "*" -> BigInteger::times
+                        val parsedOperator: (Long, Long) -> Long = when (operator) {
+                            "+" -> Long::plus
+                            "-" -> Long::minus
+                            "*" -> Long::times
                             else -> throw RuntimeException("Unknown operator: $operator")
                         }
 
                         if (worryDecreases) {
-                            parsedOperator(parsedFirstOperand, parsedSecondOperand).div(BigInteger.valueOf(3))
+                            parsedOperator(parsedFirstOperand, parsedSecondOperand).div(3L)
                         } else {
                             parsedOperator(parsedFirstOperand, parsedSecondOperand)
                         }
@@ -129,13 +122,12 @@ class Monkey private constructor(
     }
 
     private fun passItem(item: Item) {
-        otherMonkeys[if (item.worryScore.mod(testCondition).equals(BigInteger.ZERO)) throwOnTrue else throwOnFalse]!!.catchItem(item)
-//        if (item.worryScore.compareTo() > 100L) item.update { it % 231L }
+        otherMonkeys[if (item.worryScore.mod(testCondition) == 0L) throwOnTrue else throwOnFalse]!!.catchItem(item)
     }
 }
 
-class Item(var worryScore: BigInteger) {
-    fun update(updateFn: (BigInteger) -> BigInteger) {
+class Item(var worryScore: Long) {
+    fun update(updateFn: (Long) -> Long) {
         worryScore = updateFn(worryScore)
     }
 }

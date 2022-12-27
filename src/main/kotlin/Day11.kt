@@ -49,6 +49,7 @@ object Day11 {
 class Monkey private constructor(
     private val items: MutableList<Item>,
     private val inspectFun: (worry: Long) -> Long,
+    private val testCondition: Long,
     private val throwOnTrue: Int,
     private val throwOnFalse: Int,
     private val otherMonkeys: MutableMap<Int, Monkey> = mutableMapOf(),
@@ -64,13 +65,14 @@ class Monkey private constructor(
 
             return Monkey(
                 itemWorryScores.map { Item(it) }.toMutableList(),
-                parseUpdateFunction(lines[2], worryDecreases, testCondition),
+                parseUpdateFunction(lines[2], worryDecreases),
+                testCondition,
                 monkeyThrowOnTrue,
                 monkeyThrowOnFalse
             )
         }
 
-        private fun parseUpdateFunction(input: String, worryDecreases: Boolean, testCondition: Long) =
+        private fun parseUpdateFunction(input: String, worryDecreases: Boolean) =
             Regex("Operation: new = (old|\\d+) ([+\\-*/]) (old|\\d+)").find(input)!!.groupValues
                 .let { (_, firstOperand, operator, secondOperand) ->
                     { worry: Long ->
@@ -95,7 +97,7 @@ class Monkey private constructor(
                             parsedOperator(parsedFirstOperand, parsedSecondOperand).floorDiv(3L)
                         } else {
                             parsedOperator(parsedFirstOperand, parsedSecondOperand)
-                        }.mod(testCondition)
+                        }
                     }
                 }
     }
@@ -118,7 +120,8 @@ class Monkey private constructor(
     }
 
     private fun passItem(item: Item) {
-        otherMonkeys[if (item.worryScore == 0L) throwOnTrue else throwOnFalse]!!.catchItem(item)
+        otherMonkeys[if (item.worryScore % testCondition == 0L) throwOnTrue else throwOnFalse]!!.catchItem(item)
+//        if (item.worryScore > 100L) item.update { it % 231L }
     }
 }
 
